@@ -1,9 +1,11 @@
 body {
   margin: 0;
   min-height: 100vh;
+  font-family: "roboto";
 }
 
 .content {
+  padding: 1rem;
   width: 70%;
   margin: auto;
   color: rgb(64, 106, 183);
@@ -41,4 +43,33 @@ nav {
 
 .logo {
   font-size: 1.3rem;
+  letter-spacing: -1px;
+}
+
+form label {
+  display: block;
+  font-size: 1.2rem;
+}
+
+form label input {
+  width: 50%;
+  display: block;
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+  padding: 0.2rem;
+}
+
+.submit-btn {
+  border: none;
+  padding: 0.5rem 0.8rem;
+  background-color: rgb(64, 106, 183);
+  color: white;
+  font-size: 1.2rem;
+  border-radius: 18px;
+  letter-spacing: -0.5px;
+  margin-top: 0.5rem;
+}
+.submit-btn:hover {
+  cursor: pointer;
+  background-color: cornflowerblue;
 }

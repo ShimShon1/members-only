@@ -1,0 +1,11 @@
+extends layout
+block content
+ h1 Register
+ form(action="" method="post")
+  label(for="full-name") Full Name:
+   input(type="text" name="fullName" id="full-name") 
+  label(for="username") Username:
+   input(type="text" name="username" id="username") 
+  label(for="password") Password:
+   input(type="password" name="password" id="password") 
+  button.submit-btn Submit 
