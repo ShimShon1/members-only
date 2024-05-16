@@ -1,4 +1,27 @@
 extends layout
 block content
- h2 hello from index
- p Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Amet luctus venenatis lectus magna fringilla. Sed viverra ipsum nunc aliquet. Cursus euismod quis viverra nibh cras. Eu augue ut lectus arcu bibendum. Tincidunt arcu non sodales neque. Massa tincidunt dui ut ornare lectus sit. Felis eget nunc lobortis mattis aliquam. Nibh tellus molestie nunc non blandit massa enim nec dui. At urna condimentum mattis pellentesque id. Aliquam faucibus purus in massa. Penatibus et magnis dis parturient montes nascetur ridiculus. Lectus magna fringilla urna porttitor rhoncus.
+ main 
+  div.post
+   h2 Post
+   if user 
+    form.create-post(action="" method="post")
+     label(for="title") Title:
+      input(type="text" name="title" id="title") 
+     label(for="content") Content:
+      br
+      textarea#content(name="content",rows="7") 
+     button.submit-btn Submit 
+
+   else 
+    p.login-prompt Login to submit a message
+   
+   p *only memebers can view the posts details
+  div.board
+   h2 Message Board
+   for post in posts
+    article.message
+     h4=post.title
+     p=post.content
+     div.message-details 
+      span.name="By: " + (user? user.isMember ? post.user.fullName: "Unknown":"Unknown")  
+      span= (user? user.isMember ? post.formattedDate : "Unknown":"Unknown")  

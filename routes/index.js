@@ -3,14 +3,18 @@ const router = express.Router();
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const Post = require("../models/Post");
 
 //get requests
-router.get("/", function (req, res) {
-  console.log("at index", req.user);
+router.get("/", async function (req, res) {
+  const posts = await Post.find({})
+    .populate("user")
+    .sort({ date: -1 });
+  console.log(posts);
   if (req.isAuthenticated()) {
-    res.render("index", { user: req.user });
+    res.render("index", { user: req.user, posts });
   } else {
-    res.render("index");
+    res.render("index", { posts });
   }
 });
 
@@ -75,6 +79,21 @@ router.post("/members-form", async function (req, res, next) {
   } else {
     res.render("members_form");
   }
+});
+
+router.post("/", function (req, res, next) {
+  if (req.isAuthenticated()) {
+    Post.create({
+      title: req.body.title,
+      content: req.body.content,
+      date: new Date(),
+      user: req.user.id,
+    });
+  } else {
+    console.log("not logged");
+  }
+  console.log(req.body);
+  res.redirect("/");
 });
 
 module.exports = router;

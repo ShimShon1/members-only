@@ -73,3 +73,39 @@ form label input {
   cursor: pointer;
   background-color: cornflowerblue;
 }
+
+form.create-post textarea,
+form.create-post input {
+  width: 100%;
+}
+
+.login-prompt {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  gap: 2rem;
+}
+.board {
+  max-height: 100vh;
+  overflow: scroll;
+}
+.message {
+  border: 1px solid lightblue;
+  padding: 0.8rem;
+  border-radius: 5px;
+  padding-top: 0;
+}
+.name {
+  font-weight: 600;
+}
+.message-details {
+  display: flex;
+  gap: 0.5rem;
+  border-top: 1px solid rgba(128, 128, 128, 0.25);
+  justify-content: space-between;
+  padding-top: 0.5rem;
+}
