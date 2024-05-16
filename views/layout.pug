@@ -15,12 +15,17 @@ html(lang="en")
        div.logo Message Board
       
       li
-       a(href="/") Home 
-      li
-       a(href="/register") Register 
-      li
-       a(href="/login") Login 
-      li
-       a(href="/members-form") Become a memeber 
+       a(href="/") Home
+      if !user
+       li
+        a(href="/register") Register 
+       li
+        a(href="/login") Login 
+ 
+      else
+       li
+        a(href="/logout") Logout
+       li
+        a(href="/members-form") Become a member
     div.content
      block content

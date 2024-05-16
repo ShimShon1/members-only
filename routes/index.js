@@ -39,6 +39,10 @@ router.get("/members-form", function (req, res) {
   res.render("members_form");
 });
 
+router.get("/logout", function (req, res) {
+  req.logout((err) => (err ? next(err) : res.redirect("/")));
+});
+
 //post  requestsc
 router.post("/register", async function (req, res, next) {
   try {
