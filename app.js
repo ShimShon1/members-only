@@ -8,6 +8,7 @@ const LocalStrategy = require("passport-local").Strategy;
 const { default: mongoose } = require("mongoose");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
+const { render } = require("pug");
 
 require("dotenv").config();
 
@@ -60,5 +61,10 @@ passport.deserializeUser(async function (userid, done) {
 });
 
 app.use("/", router);
+
+app.use(function (err, req, res, next) {
+  console.log(err);
+  res.render("message", { message: err.message });
+});
 
 app.listen(3000);
