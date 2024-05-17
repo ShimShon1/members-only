@@ -5,10 +5,13 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const Post = require("../models/Post");
 const { body, validationResult } = require("express-validator");
-const { postValidation } = require("../validators");
-const { indexController } = require("../getControllers");
+const { postValidation, loginValidation } = require("../validators");
+const {
+  indexController,
+  loginController,
+} = require("../getControllers");
 
-//get requests
+//index | posts page
 router.get("/", indexController);
 
 router.post(
@@ -38,18 +41,12 @@ router.post(
   indexController
 );
 
+//register form
 router.get("/register", function (req, res, next) {
   if (req.isAuthenticated()) {
     res.render("message", { message: "You are already logged in!" });
   } else {
     res.render("register");
-  }
-});
-router.get("/login", function (req, res) {
-  if (req.isAuthenticated()) {
-    res.render("message", { message: "You are already logged in!" });
-  } else {
-    res.render("login");
   }
 });
 
@@ -63,11 +60,48 @@ router.get("/members-form", function (req, res) {
   res.render("members_form");
 });
 
+//login form
+router.get("/login", loginController);
+
+router.post(
+  "/login",
+  loginValidation(),
+  function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(errors);
+      req.errors = errors.array();
+      loginController(req, res, next);
+    } else {
+      next();
+    }
+  },
+  (req, res, next) => {
+    passport.authenticate("local", (err, user, info) => {
+      if (err) {
+        return next(err); // Handle any errors during authentication
+      }
+      if (!user) {
+        // Handle the failure case manually
+        req.errors = [{ msg: "Wrong user credentials" }];
+        next();
+        return; // Customize the response
+      }
+      req.logIn(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.redirect("/");
+      });
+    })(req, res, next);
+  },
+  loginController
+);
+
 router.get("/logout", function (req, res) {
   req.logout((err) => (err ? next(err) : res.redirect("/")));
 });
 
-//post  requestsc
 router.post("/register", async function (req, res, next) {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
@@ -81,14 +115,6 @@ router.post("/register", async function (req, res, next) {
     next(error);
   }
 });
-
-router.post(
-  "/login",
-  passport.authenticate("local", {
-    failureRedirect: "/login",
-    successRedirect: "/",
-  })
-);
 
 router.post("/members-form", async function (req, res, next) {
   try {

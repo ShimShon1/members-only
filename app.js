@@ -64,7 +64,7 @@ app.use("/", router);
 
 app.use(function (err, req, res, next) {
   console.log(err);
-  res.render("message", { message: err.message });
+  res.render("message", { message: err.message, user: req.user });
 });
 
 app.listen(3000);

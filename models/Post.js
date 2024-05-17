@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 
 const PostSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
+  title: { type: String, required: true, minLength: 2 },
+  content: { type: String, required: true, minLength: 2 },
   date: { type: Date, required: true },
 
   user: {
