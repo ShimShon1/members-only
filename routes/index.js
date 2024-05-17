@@ -4,19 +4,39 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 const Post = require("../models/Post");
+const { body, validationResult } = require("express-validator");
+const { postValidation } = require("../validators");
+const { indexController } = require("../getControllers");
 
 //get requests
-router.get("/", async function (req, res) {
-  const posts = await Post.find({})
-    .populate("user")
-    .sort({ date: -1 });
-  console.log(posts);
-  if (req.isAuthenticated()) {
-    res.render("index", { user: req.user, posts });
-  } else {
-    res.render("index", { posts });
-  }
-});
+router.get("/", indexController);
+
+router.post(
+  "/",
+  postValidation(),
+  async function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.errors = errors.array();
+      next();
+      return;
+    }
+    try {
+      if (req.isAuthenticated()) {
+        await Post.create({
+          title: req.body.title,
+          content: req.body.content,
+          date: new Date(),
+          user: req.user.id,
+        });
+      }
+      res.redirect("/");
+    } catch (error) {
+      next(error);
+    }
+  },
+  indexController
+);
 
 router.get("/register", function (req, res, next) {
   if (req.isAuthenticated()) {
@@ -56,11 +76,10 @@ router.post("/register", async function (req, res, next) {
       password: hash,
       fullName: req.body.fullName,
     });
+    res.redirect("login");
   } catch (error) {
     next(error);
   }
-
-  res.redirect("login");
 });
 
 router.post(
@@ -72,28 +91,25 @@ router.post(
 );
 
 router.post("/members-form", async function (req, res, next) {
-  if (req.body.membersCode === process.env.MEMBERS_CODE) {
-    req.user.isMember = true;
-    await req.user.save();
-    res.render("message", { message: "Welcome, member" });
-  } else {
-    res.render("members_form");
+  try {
+    if (req.body.membersCode === process.env.MEMBERS_CODE) {
+      req.user.isMember = true;
+      await req.user.save();
+      res.render("message", { message: "Welcome, member" });
+    } else {
+      res.render("members_form");
+    }
+  } catch (error) {
+    next(error);
   }
 });
 
-router.post("/", function (req, res, next) {
-  if (req.isAuthenticated()) {
-    Post.create({
-      title: req.body.title,
-      content: req.body.content,
-      date: new Date(),
-      user: req.user.id,
-    });
-  } else {
-    console.log("not logged");
+router.post("/delete/:id", async function (req, res, next) {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    res.redirect("/");
+  } catch (error) {
+    next(error);
   }
-  console.log(req.body);
-  res.redirect("/");
 });
-
 module.exports = router;

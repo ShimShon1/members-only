@@ -109,3 +109,15 @@ main {
   justify-content: space-between;
   padding-top: 0.5rem;
 }
+
+.delete-btn {
+  color: rgb(186, 61, 61);
+  margin-top: 0.5rem;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.error {
+  color: rgb(179, 45, 45);
+  font-weight: bolder;
+}

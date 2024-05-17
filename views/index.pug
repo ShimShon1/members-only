@@ -6,20 +6,30 @@ block content
    if user 
     form.create-post(action="" method="post")
      label(for="title") Title:
-      input(type="text" name="title" id="title") 
+      input(type="text" name="title" id="title" required=true value=failedPost?failedPost.title:"") 
      label(for="content") Content:
       br
-      textarea#content(name="content",rows="7") 
+      textarea#content(name="content",rows="7" required=true)=failedPost?failedPost.content:"" 
      button.submit-btn Submit 
 
    else 
     p.login-prompt Login to submit a message
    
-   p *only memebers can view the posts details
+   if errors
+    ul 
+     for error in errors 
+      li.error=error.msg
+   p -only memebers can view the posts details 
+    br
+    |-only admins can delete posts
   div.board
    h2 Message Board
    for post in posts
     article.message
+     if user
+      if user.isAdmin
+       form(action=("/delete/" + post.id),method="post")
+        button.delete-btn Delete 
      h4=post.title
      p=post.content
      div.message-details 
