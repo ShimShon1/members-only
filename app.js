@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const app = express();
 const MongoStore = require("connect-mongo");
+const helmet = require("helmet");
 const router = require("./routes/index.js");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
@@ -9,7 +10,7 @@ const { default: mongoose } = require("mongoose");
 const User = require("./models/User.js");
 const bcrypt = require("bcrypt");
 const { render } = require("pug");
-
+const { rateLimit } = require("express-rate-limit");
 require("dotenv").config();
 
 app.set("views", __dirname + "/views");
@@ -18,6 +19,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 mongoose.connect(process.env.DB_LINK);
 app.use(express.static("public"));
+app.use(helmet());
+const limiter = rateLimit({
+  windowMs: 60 * 1000 * 15, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  standardHeaders: "draft-7", // draft-6: `RateLimit-*` headers; draft-7: combined `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers.
+});
+app.use(limiter);
 app.use(
   session({
     secret: process.env.SECRET,
