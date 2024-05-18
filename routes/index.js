@@ -1,20 +1,20 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../models/User");
+const User = require("../models/User.js");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const Post = require("../models/Post");
+const Post = require("../models/Post.js");
 const { body, validationResult } = require("express-validator");
 const {
   postValidation,
   loginValidation,
   registerValidation,
-} = require("../validators");
+} = require("../validators.js");
 const {
   indexController,
   loginController,
   registerController,
-} = require("../getControllers");
+} = require("../getControllers.js");
 
 //index | posts page
 router.get("/", indexController);

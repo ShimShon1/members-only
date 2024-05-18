@@ -2,11 +2,11 @@ const express = require("express");
 const session = require("express-session");
 const app = express();
 const MongoStore = require("connect-mongo");
-const router = require("./routes");
+const router = require("./routes/index.js");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const { default: mongoose } = require("mongoose");
-const User = require("./models/User");
+const User = require("./models/User.js");
 const bcrypt = require("bcrypt");
 const { render } = require("pug");
 
@@ -67,4 +67,4 @@ app.use(function (err, req, res, next) {
   res.render("message", { message: err.message, user: req.user });
 });
 
-app.listen(3000);
+app.listen(process.env.PORT || 3000);
