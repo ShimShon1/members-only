@@ -5,10 +5,15 @@ const bcrypt = require("bcrypt");
 const passport = require("passport");
 const Post = require("../models/Post");
 const { body, validationResult } = require("express-validator");
-const { postValidation, loginValidation } = require("../validators");
+const {
+  postValidation,
+  loginValidation,
+  registerValidation,
+} = require("../validators");
 const {
   indexController,
   loginController,
+  registerController,
 } = require("../getControllers");
 
 //index | posts page
@@ -42,13 +47,40 @@ router.post(
 );
 
 //register form
-router.get("/register", function (req, res, next) {
-  if (req.isAuthenticated()) {
-    res.render("message", { message: "You are already logged in!" });
-  } else {
-    res.render("register");
-  }
-});
+router.get("/register", registerController);
+
+router.post(
+  "/register",
+  registerValidation(),
+  async function (req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      req.errors = errors.array();
+      next();
+      return;
+    }
+    try {
+      const userExists = await User.exists({
+        username: req.body.username,
+      }).collation({ locale: "en", strength: 2 });
+      if (userExists) {
+        req.errors = [{ msg: "Username is taken" }];
+        next();
+        return;
+      }
+      const hash = await bcrypt.hash(req.body.password, 10);
+      await User.create({
+        username: req.body.username,
+        password: hash,
+        fullName: req.body.fullName,
+      });
+      res.redirect("login");
+    } catch (error) {
+      next(error);
+    }
+  },
+  registerController
+);
 
 router.get("/members-form", function (req, res) {
   if (!req.isAuthenticated()) {
@@ -57,7 +89,7 @@ router.get("/members-form", function (req, res) {
     });
     return;
   }
-  res.render("members_form");
+  res.render("members_form", { user: req.user });
 });
 
 //login form
@@ -69,7 +101,6 @@ router.post(
   function (req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      console.log(errors);
       req.errors = errors.array();
       loginController(req, res, next);
     } else {
@@ -102,28 +133,20 @@ router.get("/logout", function (req, res) {
   req.logout((err) => (err ? next(err) : res.redirect("/")));
 });
 
-router.post("/register", async function (req, res, next) {
-  try {
-    const hash = await bcrypt.hash(req.body.password, 10);
-    await User.create({
-      username: req.body.username,
-      password: hash,
-      fullName: req.body.fullName,
-    });
-    res.redirect("login");
-  } catch (error) {
-    next(error);
-  }
-});
-
 router.post("/members-form", async function (req, res, next) {
   try {
     if (req.body.membersCode === process.env.MEMBERS_CODE) {
       req.user.isMember = true;
       await req.user.save();
-      res.render("message", { message: "Welcome, member" });
+      res.render("message", {
+        message: "Welcome, member",
+        user: req.user,
+      });
     } else {
-      res.render("members_form");
+      res.render("members_form", {
+        user: req.user,
+        errors: [{ msg: "Wrong members code!" }],
+      });
     }
   } catch (error) {
     next(error);

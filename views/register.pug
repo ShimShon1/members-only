@@ -3,9 +3,15 @@ block content
  h1 Register
  form(action="" method="post")
   label(for="full-name") Full Name:
-   input(type="text" name="fullName" id="full-name") 
+   input(type="text" name="fullName" id="full-name" value=failedRegister?failedRegister.fullName:"") 
   label(for="username") Username:
-   input(type="text" name="username" id="username") 
+   input(type="text" name="username" id="username" value=failedRegister?failedRegister.username:"") 
   label(for="password") Password:
-   input(type="password" name="password" id="password") 
+   input(type="password" name="password" id="password" value=failedRegister?failedRegister.password:"") 
+  label(for="confirmPassword") Confirm Password:
+   input(type="password" name="confirmPassword" id="confirmPassword" value=failedRegister?failedRegister.confirmPassword:"") 
   button.submit-btn Submit 
+  if errors
+   ul 
+    for error in errors 
+     li.error=error.msg
