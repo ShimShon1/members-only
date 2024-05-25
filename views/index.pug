@@ -19,9 +19,12 @@ block content
     ul 
      for error in errors 
       li.error=error.msg
-   p -only memebers can view the posts details 
+   p *only memebers can view the posts details 
     br
-    |-only admins can delete posts
+    |*only admins can delete posts
+    br
+    |*members code is: 
+    i  cats
   div.board
    h2 Message Board
    for post in posts
